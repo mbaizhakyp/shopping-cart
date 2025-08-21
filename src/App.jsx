@@ -6,6 +6,8 @@ import { cartItemCount } from "./cartItemCount";
 import { handleUpdateQuantity } from "./handleUpdateQuantity";
 import { handleRemoveFromCart } from "./handleRemoveFromCart";
 import { handleCheckout } from "./handleCheckout";
+import Header from "./Header";
+import CheckoutMessage from "./CheckoutMessage";
 
 // Main App component that manages all state and renders pages.
 export default function App() {
@@ -47,37 +49,6 @@ export default function App() {
   const totalCartPrice = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
-  );
-
-  // A shared header component for all pages.
-  const Header = () => (
-    <header className="header">
-      <div className="container header-container">
-        <h1 className="logo" onClick={() => setCurrentPage("home")}>
-          E-Commerce Store
-        </h1>
-        <nav className="nav">
-          <button className="nav-button" onClick={() => setCurrentPage("home")}>
-            <Home size={24} />
-            <span className="nav-text">Home</span>
-          </button>
-          <button className="nav-button" onClick={() => setCurrentPage("shop")}>
-            <ShoppingBag size={24} />
-            <span className="nav-text">Shop</span>
-          </button>
-          <button
-            className="nav-button nav-cart"
-            onClick={() => setCurrentPage("cart")}
-          >
-            <ShoppingCart size={24} />
-            <span className="nav-text">Cart</span>
-            {cartItemCount(cartItems) > 0 && (
-              <span className="cart-count">{cartItemCount(cartItems)}</span>
-            )}
-          </button>
-        </nav>
-      </div>
-    </header>
   );
 
   // Component for the home page.
@@ -265,7 +236,9 @@ export default function App() {
           <div className="cart-summary-container">
             <p className="cart-total">Total: ${totalCartPrice.toFixed(2)}</p>
             <button
-              onClick={handleCheckout(setShowCheckoutMessage, setCartItems)}
+              onClick={() =>
+                handleCheckout(setShowCheckoutMessage, setCartItems)
+              }
               className="checkout-button"
             >
               Checkout
@@ -276,39 +249,22 @@ export default function App() {
     </main>
   );
 
-  // Custom message box for checkout
-  const CheckoutMessage = () => (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <h3 className="modal-title">Order Confirmed!</h3>
-        <p className="modal-body-text">
-          Thank you for your order. Your cart has been emptied.
-        </p>
-        <button
-          onClick={() => {
-            setShowCheckoutMessage(false);
-            setCurrentPage("shop");
-          }}
-          className="modal-button"
-        >
-          Continue Shopping
-        </button>
-      </div>
-    </div>
-  );
-
   return (
     <div className="app-container">
-      <style>
-        {`
-          
-        `}
-      </style>
-      <Header />
+      <Header
+        setCurrentPage={setCurrentPage}
+        cartItemCount={cartItemCount}
+        cartItems={cartItems}
+      />
       {currentPage === "home" && <HomePage />}
       {currentPage === "shop" && <ShopPage />}
       {currentPage === "cart" && <CartPage />}
-      {showCheckoutMessage && <CheckoutMessage />}
+      {showCheckoutMessage && (
+        <CheckoutMessage
+          setShowCheckoutMessage={setShowCheckoutMessage}
+          setCurrentPage={setCurrentPage}
+        />
+      )}
     </div>
   );
 }
